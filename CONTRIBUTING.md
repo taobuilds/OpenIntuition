@@ -11,4 +11,4 @@ Keep changes small. A validator change should include a valid case and an invali
 
 For a new scenario, write the events and expected answers first. Check temporary scope and revocation against [the event rules](docs/policy_spec.md). Do not derive the reference answer from the policy being tested.
 
-The current data are development examples. A later policy runner must receive only events up to the query step, never the expected answer or future events.
+The current data are development examples. Policies receive only events up to the query step, the query key, and the session ID. Keep expected answers and future events outside that interface. Include a boundary test when changing the runner.

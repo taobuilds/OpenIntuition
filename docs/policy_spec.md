@@ -19,10 +19,10 @@ Checkpoints contain `id`, `as_of_step`, `key`, `session_id`, `expected`. IDs are
 
 The reference answers are explicitly authored from the agreed scenario table, not calculated from policy outputs. Validation checks structure, not whether an expected answer is semantically correct. Human review remains necessary.
 
-## Input isolation for future policies
+## Policy input isolation
 
-The evaluator must construct an event prefix ending at `as_of_step` and pass only that prefix, the query key, and session ID to a policy. It must not pass checkpoints, expected labels, scenario category/ID, or future events. `Event` contains no answer field. Policy execution is not implemented yet; this boundary must be enforced when the runner is added.
+The evaluator constructs an event prefix ending at `as_of_step` and passes only that prefix, the query key, and session ID to a policy. It does not pass checkpoints, expected labels, scenario category/ID, or future events. `Event` contains no answer field. Each query starts from its own prefix, so out-of-order checkpoints and independent scenarios do not share mutable state. These local policies run in the same Python process; this input boundary is not a security sandbox for untrusted code.
 
-## Planned comparison
+## Local comparison
 
 `naive_last_value` selects the latest set/temporary value for the queried key, ignoring session scope and revocation. `scoped_state` applies the rules above. These are local reference programs, with no language model involved. Matching labels on these synthetic fixtures demonstrates rule conformance, not general AI capability.
