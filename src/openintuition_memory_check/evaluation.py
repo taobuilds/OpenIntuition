@@ -3,9 +3,11 @@
 from collections import defaultdict
 from dataclasses import asdict, dataclass
 import json
+from html import escape
 from pathlib import Path
 
 from .policies import Policy
+from .reporting import html_report
 from .schema import Scenario
 
 
@@ -66,7 +68,7 @@ def summarize(predictions: tuple[Prediction, ...]) -> dict:
 
 
 def _cell(value: str) -> str:
-    return value.replace("\\", "\\\\").replace("|", "\\|").replace("\n", "<br>").replace("\r", "")
+    return escape(value).replace("\\", "\\\\").replace("|", "\\|").replace("\n", "<br>").replace("\r", "")
 
 
 def markdown_report(predictions: tuple[Prediction, ...], summary: dict) -> str:
@@ -99,14 +101,27 @@ def markdown_report(predictions: tuple[Prediction, ...], summary: dict) -> str:
     return "\n".join(lines) + "\n"
 
 
-def write_results(output: str | Path, predictions: tuple[Prediction, ...], summary: dict) -> None:
+def write_results(output: str | Path, predictions: tuple[Prediction, ...], summary: dict,
+                  *, scenarios: tuple[Scenario, ...], manifest: dict) -> None:
     """Create a new result directory; never overwrite an earlier run."""
     files = {
         "summary.json": json.dumps(summary, ensure_ascii=False, indent=2) + "\n",
         "predictions.jsonl": "".join(json.dumps(asdict(row), ensure_ascii=False) + "\n" for row in predictions),
         "report.md": markdown_report(predictions, summary),
+        "report.html": html_report(scenarios, predictions, summary, manifest),
+        "manifest.json": json.dumps(manifest, ensure_ascii=False, indent=2) + "\n",
     }
     directory = Path(output)
     directory.mkdir(parents=True, exist_ok=False)
-    for name, contents in files.items():
-        (directory / name).write_text(contents, encoding="utf-8")
+    created = []
+    try:
+        for name, contents in files.items():
+            path = directory / name
+            with path.open("x", encoding="utf-8") as stream:
+                created.append(path)
+                stream.write(contents)
+    except BaseException:
+        for path in created:
+            path.unlink(missing_ok=True)
+        directory.rmdir()
+        raise

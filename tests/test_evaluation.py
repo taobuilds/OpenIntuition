@@ -78,14 +78,14 @@ def test_pilot_results_and_saved_outputs(tmp_path):
     assert summary["scoped_state"]["scenarios_passed"] == 8
     assert summary["naive_last_value"]["categories"]["revoke"]["correct"] == 3
     output = tmp_path / "results"
-    write_results(output, predictions, summary)
+    write_results(output, predictions, summary, scenarios=load_scenarios(DATA), manifest={"tool_version": "test", "dataset": {"name": "pilot", "sha256": "test"}})
     saved = [json.loads(line) for line in (output / "predictions.jsonl").read_text().splitlines()]
     assert len(saved) == 48
     assert sum(not row["correct"] for row in saved) == 5
     assert json.loads((output / "summary.json").read_text()) == summary
     assert "19/24" in (output / "report.md").read_text()
     with pytest.raises(FileExistsError):
-        write_results(output, (), {})
+        write_results(output, (), {}, scenarios=(), manifest={})
     assert json.loads((output / "summary.json").read_text()) == summary
 
 

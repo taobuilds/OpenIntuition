@@ -4,6 +4,7 @@
 
 - `openintuition-logo.png`: transparent square mascot for avatars and README use.
 - `openintuition-banner.png`: wide header with the mascot and project wordmark.
+- `report-preview.png`: an actual Chromium screenshot of the extended demo with mismatches selected; not generated artwork.
 
 The final direction uses thin irregular pen lines, flat color areas, asymmetric eyes, a teal owl, a cream face, and an orange intuition spark. The user supplied two illustrations as style references. Those reference screenshots are not distributed with this repository. The owl is a newly generated character; it does not reproduce the reference characters.
 

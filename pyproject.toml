@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "openintuition"
-version = "0.1.0.dev2"
+version = "0.2.0"
 description = "Offline regression checks for preference state updates"
 authors = [{name = "taobuilds"}]
 license = "MIT"
@@ -19,6 +19,12 @@ Issues = "https://github.com/taobuilds/OpenIntuition/issues"
 
 [project.optional-dependencies]
 dev = ["pytest>=8,<9"]
+
+[project.scripts]
+openintuition = "openintuition_memory_check.cli:main"
+
+[tool.setuptools.package-data]
+openintuition_memory_check = ["resources/*.html", "resources/*.png", "resources/*.jsonl"]
 
 [tool.setuptools.packages.find]
 where = ["src"]

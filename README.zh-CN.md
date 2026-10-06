@@ -8,9 +8,9 @@
 
 用户会改主意，有些要求只对当前会话有效，也可能要求撤销之前的偏好。OpenIntuition 把这些变化写成明确的事件序列，运行不同记忆策略，再告诉你：它们在哪里答对了，在哪里还在使用不适用的旧设置。
 
-[English](README.md) · [中文上手教程](docs/GETTING_STARTED.zh-CN.md) · [示例结果报告](docs/example_results.md) · [事件规则](docs/policy_spec.md) · [参与开发](CONTRIBUTING.md)
+[打开浏览器演示](https://taobuilds.github.io/OpenIntuition/) · [English](README.md) · [中文上手教程](docs/GETTING_STARTED.zh-CN.md) · [示例结果报告](docs/example_results.md) · [事件规则](docs/policy_spec.md) · [参与开发](CONTRIBUTING.md)
 
-**当前版本：** `0.1.0.dev2` · Python 3.12 · MIT 开源 · 无运行时依赖 · 不需要 API key
+**当前版本：** `0.2.0` · Python 3.12 · MIT 开源 · 无运行时依赖 · 不需要 API key
 
 ## 为什么要做这个项目？
 
@@ -28,6 +28,10 @@
 
 OpenIntuition 从这些小而具体的问题开始，让错误可以被复现、定位和讨论。
 
+[直接打开浏览器演示](https://taobuilds.github.io/OpenIntuition/)，不需要安装。演示是 Python 程序生成的只读报告，展示已运行的结果，不会在网页上调用模型或接收新的数据。
+
+![浏览器报告：临时偏好影响其他会话的错误](assets/report-preview.png)
+
 ## 现在已经能做什么？
 
 - 校验 UTF-8 JSONL 场景数据，发现错误时给出文件、行号和字段。
@@ -37,7 +41,7 @@ OpenIntuition 从这些小而具体的问题开始，让错误可以被复现、
 - 保存每条预测，并生成列出错误的 Markdown 报告。
 - 让策略只看到查询时刻之前的事件，不把参考答案传进去。
 
-自带数据包含 **8 个虚构场景、24 个检查点**，覆盖长期更新、临时例外、撤销和无关事件。当前输入是结构化事件；项目还没有从自然语言聊天中提取偏好，也没有调用真实模型。
+扩展数据包含 **20 个虚构场景、72 个检查点**，覆盖长期更新、临时例外、撤销和无关事件。原来的 8 个场景保留在试验数据中，也是扩展数据的子集，不能当成两组独立实验。当前输入是结构化事件；项目还没有从自然语言聊天中提取偏好，也没有调用真实模型。
 
 ## 几分钟跑起来
 
@@ -52,20 +56,23 @@ source .venv/bin/activate
 python -m pip install -e '.[dev]'
 
 python -m openintuition_memory_check validate --data data/scenarios.jsonl
-python -m openintuition_memory_check run --data data/scenarios.jsonl --policy both --output results/first-run
+openintuition demo --output results/first-run
 ```
 
 预期终端输出：
 
 ```text
-naive_last_value: 19/24 checkpoints (79.2%); 4/8 scenarios fully correct
-scoped_state: 24/24 checkpoints (100.0%); 8/8 scenarios fully correct
+naive_last_value: 54/72 checkpoints (75.0%); 10/20 scenarios fully correct
+scoped_state: 72/72 checkpoints (100.0%); 20/20 scenarios fully correct
 Results: results/first-run/report.md
+Browser report: results/first-run/report.html
 ```
 
-打开 `results/first-run/report.md` 看结果。每次运行请使用**新的输出目录**，例如 `results/second-run`。程序会拒绝覆盖已有目录，避免丢失之前的结果。
+打开 `results/first-run/report.html` 查看浏览器报告。可以筛选策略、类别、场景和答错记录；点击检查点，查看当时的事件历史、参考答案和预测。右上角可以切换中英文。页面自带数据和图片，不需要启动服务器或联网。`report.md` 保留纯文本结果。每次运行请使用**新的输出目录**，例如 `results/second-run`。程序会拒绝覆盖已有目录，避免丢失之前的结果。
 
 安装时需要下载开发工具；评估本身在本地完成，不需要联网、API key 或模型服务。`dev` 额外安装 pytest；如果只想使用工具，可以运行 `python -m pip install -e .`。
+
+`demo` 自带场景，所以独立安装后也不需要找到数据文件。测试自己的数据时可以运行 `openintuition run --data path/to/scenarios.jsonl --policy both --output results/custom-run`。
 
 项目更名后，Python 模块仍叫 `openintuition_memory_check`，所以之前的命令仍然可用。
 
@@ -86,29 +93,31 @@ python -m openintuition_memory_check run --data data/scenarios.jsonl --policy sc
 
 ## 怎么读懂分数？
 
-在自带的 `pilot-0.1` 数据上：
+在自带的 `extended-0.1` 数据上：
 
 | 场景类型 | 检查点数量 | 只记最后一个值 | 区分会话、处理撤销 |
 | --- | ---: | ---: | ---: |
-| 长期偏好更新 | 6 | 6/6 | 6/6 |
-| 临时例外 | 6 | 4/6 | 6/6 |
-| 撤销偏好 | 6 | 3/6 | 6/6 |
-| 无关事件 | 6 | 6/6 | 6/6 |
-| **合计** | **24** | **19/24（79.2%）** | **24/24（100.0%）** |
+| 长期偏好更新 | 18 | 18/18 | 18/18 |
+| 临时例外 | 18 | 11/18 | 18/18 |
+| 撤销偏好 | 18 | 7/18 | 18/18 |
+| 无关事件 | 18 | 18/18 | 18/18 |
+| **合计** | **72** | **54/72（75.0%）** | **72/72（100.0%）** |
 
-简单策略错了 5 次：2 次把一个会话的临时偏好带到了其他会话，3 次在撤销后仍返回旧设置。它在 8 个场景中的 4 个场景里全部答对；按范围处理的策略在 8 个场景里全部答对。
+简单策略错了 18 次：临时场景中 7 次、撤销场景中 11 次。它在 20 个场景中的 10 个场景里全部答对；按范围处理的策略在 20 个场景里全部答对。新增场景包括连续临时更新、撤销后重新设置、不同偏好互不影响，具体参考答案见[案例审查说明](docs/CASE_REVIEW.md)。
 
-**100% 表示符合当前定义的规则。** 参考答案也是按这些规则写的，所以这个分数还不能证明真实 AI 的记忆能力、更复杂历史上的泛化能力，或比其他产品更好。同一场景的 3 个检查点共享历史，24 个检查点也不等于 24 个独立实验。
+**100% 表示符合当前定义的规则。** 参考答案也是按这些规则写的，所以这个分数还不能证明真实 AI 的记忆能力、更复杂历史上的泛化能力，或比其他产品更好。同一场景的检查点共享历史，72 个检查点也不等于 72 个独立实验。这些仍是开发案例，还没有经过独立人工审查。
 
-### 三份结果文件
+### 五份结果文件
 
 | 文件 | 内容 | 什么时候看 |
 | --- | --- | --- |
+| `report.html` | 离线交互报告、事件历史、中英说明 | 想直观看到某次预测依据的历史 |
+| `manifest.json` | 数据 SHA-256、工具版本、数量和策略 | 想确认两次运行使用的是否为同一份数据 |
 | `report.md` | 总分、分类分数、逐条错误 | 想直接读懂结果、定位错误 |
 | `predictions.jsonl` | 每种策略在每个检查点的答案 | 想筛选错误或写分析脚本 |
 | `summary.json` | 每种策略的汇总指标 | 想让另一个程序读取分数 |
 
-同时运行两种策略会产生 **48 条预测记录**。每条记录包含策略、场景、类别、检查点、查询步骤、偏好键、会话、参考答案、预测和是否答对。
+同时运行两种策略会产生 **144 条预测记录**。每条记录包含策略、场景、类别、检查点、查询步骤、偏好键、会话、参考答案、预测和是否答对。
 
 例如：
 
@@ -116,9 +125,9 @@ python -m openintuition_memory_check run --data data/scenarios.jsonl --policy sc
 {"policy":"naive_last_value","scenario":"temporary_01","category":"temporary","checkpoint":"q3","as_of_step":3,"key":"theme","session_id":"S2","expected":"dark","predicted":"light","correct":false}
 ```
 
-`expected` 是预先写好的标签，`predicted` 才是程序计算的结果。两个字符串完全一致才算答对。完整示例见[结果报告](docs/example_results.md)。
+`expected` 是预先写好的标签，`predicted` 才是程序计算的结果。两个字符串完全一致才算答对。完整示例见[扩展结果报告](docs/extended_results.md)。
 
-策略答错属于正常的比较结果，运行完成后退出码仍是 `0`；输入错误或输出目录错误返回 `2`。
+策略答错属于正常的比较结果，运行完成后退出码仍是 `0`；为 `run` 增加 `--fail-on-mismatch` 参数后，出现任何答案不一致就返回 `1`，报告仍会保存，适合在自动回归检查中使用。输入错误或输出目录错误返回 `2`。
 
 ## 场景数据怎么写？
 
@@ -160,17 +169,22 @@ python -m openintuition_memory_check validate --data data/scenarios.jsonl --revi
 ```text
 assets/                            标志、横幅和设计说明
 data/
-  scenarios.jsonl                  八个虚构场景
+  scenarios.jsonl                  原始八个场景
+  extended_scenarios.jsonl          包含原始案例的二十个场景
   DATASET_CARD.md                  数据来源与限制
 docs/
   policy_spec.md                   事件和查询规则
-  example_results.md               已生成的示例报告
+  example_results.md               原始案例报告
+  extended_results.md              扩展案例报告
+  index.html                       自带数据的浏览器演示
   GETTING_STARTED.zh-CN.md          中文上手教程
 src/openintuition_memory_check/
   schema.py                        数据类型和字段校验
   dataset.py                       读取 JSONL 和报告文件错误
   policies.py                      两种偏好策略
-  evaluation.py                    预测、评分和报告
+  evaluation.py                    预测、评分和文件输出
+  reporting.py                     HTML 数据转义和生成
+  resources/                       安装时自带的场景、模板和标志
   cli.py                           终端命令入口
 tests/                             格式、策略和输入边界测试
 ```
@@ -194,17 +208,32 @@ python -m pytest -q
 | 某条数据校验失败 | 根据错误给出的行号和字段修改 |
 | 策略答案与参考标签不同 | 先复查事件规则和标签，再判断是哪一方有问题 |
 
+
+[自动测试工作流](.github/workflows/tests.yml) 在 Linux、macOS 和 Windows 上检查 Python 3.12，另有 Chromium 测试覆盖筛选、语言切换、历史显示、离线资源和窄屏布局。日常 Python 测试只需要 dev 依赖；本地浏览器测试需要额外安装：
+
+```bash
+python -m pip install playwright
+python -m playwright install chromium
+python scripts/check_browser_report.py results/first-run/report.html
+```
+
+修改报告模板或自带数据后，运行 `python scripts/update_demo.py` 更新仓库中的演示。`data/extended_scenarios.jsonl` 和 `src/openintuition_memory_check/resources/` 中的副本必须一致，测试会检查。版本变化见[更新记录](CHANGELOG.md)。
+
+Windows PowerShell 可以用 `py -3.12 -m venv .venv` 创建环境，然后用 `.venv\Scripts\python -m pip install -e '.[dev]'` 安装，再用 `.venv\Scripts\python -m openintuition_memory_check demo --output results/first-run` 运行，不必先激活环境。
+
 ## 接下来做什么？
 
 - [x] 结构化场景和严格校验
 - [x] 两种本地策略比较，按检查点和完整场景评分
 - [x] 逐条预测文件和可阅读的错误报告
-- [ ] 更长的历史、重复临时更新、更多偏好键组合
+- [x] 更长的历史、重复临时更新、多个偏好键
+- [x] 离线双语浏览器报告和数据指纹
+- [x] Linux、macOS、Windows 自动测试
 - [ ] 独立审查的评估场景
 - [ ] 在相同输入接口下增加其他策略
 - [ ] 自然语言提取和可选模型接入
 
-目前优先增加明确偏好变化的测试覆盖，再考虑模型调用。
+目前优先让更多人独立审查案例，并增加测试覆盖，再考虑模型调用。
 
 ## 项目的小猫头鹰
 
