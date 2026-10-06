@@ -1,4 +1,4 @@
-# OpenIntuition Memory Check
+# OpenIntuition
 
 Small test cases for preference memory: permanent changes, session-specific exceptions, and revoked settings.
 
@@ -11,6 +11,8 @@ The repository currently contains eight synthetic scenarios and a JSONL validato
 Requires Python 3.12. From the repository root on macOS or Linux:
 
 ```bash
+git clone https://github.com/taobuilds/OpenIntuition.git
+cd OpenIntuition
 python3 -m venv .venv
 source .venv/bin/activate
 python -m pip install -e '.[dev]'
