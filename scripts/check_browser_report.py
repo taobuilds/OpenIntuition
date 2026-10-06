@@ -31,6 +31,7 @@ def check(path: Path):
         page.select_option('#category', '')
         page.locator('#rows button').first.click()
         assert page.locator('#detail .answer.bad').count() == 1
+        assert page.locator('#rows button[aria-pressed="true"]').evaluate('(button) => button === document.activeElement')
         page.select_option('#policy', 'scoped_state')
         assert page.locator('#rows tr').count() == 0
         assert page.locator('#empty').is_visible()

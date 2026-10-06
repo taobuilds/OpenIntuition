@@ -103,7 +103,7 @@ def test_raw_unicode_line_separator_remains_inside_json_string(tmp_path):
     raw = (ROOT/'data/scenarios.jsonl').read_text().splitlines()[0]
     data = json.loads(raw)
     data['events'][0]['value'] = 'dark\u2028mode'
-    path.write_text(json.dumps(data, ensure_ascii=False)+'\n')
+    path.write_text(json.dumps(data, ensure_ascii=False)+'\n', encoding='utf-8')
     assert load_scenarios(path)[0].events[0].value == 'dark\u2028mode'
 
 
