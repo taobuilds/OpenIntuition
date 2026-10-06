@@ -68,7 +68,7 @@ Results: results/first-run/report.md
 Browser report: results/first-run/report.html
 ```
 
-Open `results/first-run/report.html` in your browser. Filter by policy, category, scenario, or match status; select a checkpoint to see its event history and answers. Switch between English and Chinese at the top. The file is self-contained and works offline. `report.md` contains a text-only summary. Use a **new output directory** for every run, such as `results/second-run`; the runner refuses to overwrite an existing one.
+Open `results/first-run/report.html` in your browser. Filter by policy, category, scenario, or match status; select a checkpoint to see its event history and answers. The report opens in English; switch to Chinese at the top. The file is self-contained and works offline. `report.md` contains a text-only summary. Use a **new output directory** for every run, such as `results/second-run`; the runner refuses to overwrite an existing one.
 
 No API key or model service is needed. Installation downloads development tools; evaluation runs locally without network access. The `dev` extra installs pytest. For regular use without pytest, install with `python -m pip install -e .`.
 

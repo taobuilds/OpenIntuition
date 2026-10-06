@@ -12,7 +12,7 @@ OpenIntuition 目前回答一个具体问题：当用户更新、临时改变或
 python -m openintuition_memory_check demo --output results/demo-v02
 ```
 
-打开生成的 `results/demo-v02/report.html`，可以筛选答错记录、点击查询查看历史，也可以切换中英文。不需要启动服务器、联网或填写 API key。自带的扩展数据有 20 个场景、72 个检查点；两种策略分别答对 54 和 72 个。`manifest.json` 保存数据指纹和工具版本。
+打开生成的 `results/demo-v02/report.html`，可以筛选答错记录、点击查询查看历史，默认使用英文，也可以在右上角切换到中文。不需要启动服务器、联网或填写 API key。自带的扩展数据有 20 个场景、72 个检查点；两种策略分别答对 54 和 72 个。`manifest.json` 保存数据指纹和工具版本。
 
 以下教程仍使用原始的 8 个场景、24 个检查点，便于从小案例开始理解。原始数据是扩展数据的子集，不是另一组独立实验。
 

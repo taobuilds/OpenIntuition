@@ -19,6 +19,9 @@ def check(path: Path):
         page.on('request', lambda request: requests.append(request.url))
         page.goto(path.resolve().as_uri())
         page.wait_for_selector('#rows tr')
+        assert page.locator('html').get_attribute('lang') == 'en'
+        assert page.locator('#language').input_value() == 'en'
+        assert page.evaluate('getComputedStyle(document.body).backgroundColor') == 'rgb(255, 255, 255)'
         count = page.locator('#rows tr').count()
         assert count > 0
         page.select_option('#outcome', 'failed')
@@ -41,6 +44,8 @@ def check(path: Path):
         assert page.locator('#rows tr').count() == 4
         page.locator('#rows button').first.click()
         assert page.locator('#detail .timeline li').count() == 3
+        page.select_option('#language', 'zh')
+        assert page.locator('html').get_attribute('lang') == 'zh-CN'
         page.select_option('#language', 'en')
         assert page.locator('html').get_attribute('lang') == 'en'
         assert page.locator('#policy').input_value() == 'scoped_state'

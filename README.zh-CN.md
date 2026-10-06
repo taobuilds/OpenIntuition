@@ -68,7 +68,7 @@ Results: results/first-run/report.md
 Browser report: results/first-run/report.html
 ```
 
-打开 `results/first-run/report.html` 查看浏览器报告。可以筛选策略、类别、场景和答错记录；点击检查点，查看当时的事件历史、参考答案和预测。右上角可以切换中英文。页面自带数据和图片，不需要启动服务器或联网。`report.md` 保留纯文本结果。每次运行请使用**新的输出目录**，例如 `results/second-run`。程序会拒绝覆盖已有目录，避免丢失之前的结果。
+打开 `results/first-run/report.html` 查看浏览器报告。可以筛选策略、类别、场景和答错记录；点击检查点，查看当时的事件历史、参考答案和预测。默认使用英文，右上角可以切换到中文。页面自带数据和图片，不需要启动服务器或联网。`report.md` 保留纯文本结果。每次运行请使用**新的输出目录**，例如 `results/second-run`。程序会拒绝覆盖已有目录，避免丢失之前的结果。
 
 安装时需要下载开发工具；评估本身在本地完成，不需要联网、API key 或模型服务。`dev` 额外安装 pytest；如果只想使用工具，可以运行 `python -m pip install -e .`。
 
